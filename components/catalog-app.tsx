@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 export type CatalogProduct = {
   id: string | number;
@@ -24,6 +24,9 @@ export type CatalogShop = {
   logoUrl?: string | null;
   bannerUrl?: string | null;
   primaryColor?: string | null;
+  accentColor?: string | null;
+  backgroundColor?: string | null;
+  textColor?: string | null;
   isOpen?: boolean;
   statusLabel?: string;
 };
@@ -100,6 +103,23 @@ const demoProducts: CatalogProduct[] = [
 
 const money = (value: number) => value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
+function darken(hex: string, amount: number) {
+  const match = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!match) return hex;
+  const channels = match[1].match(/../g)!.map((channel) => Math.max(0, Math.round(parseInt(channel, 16) * (1 - amount))));
+  return `#${channels.map((channel) => channel.toString(16).padStart(2, "0")).join("")}`;
+}
+
+function shopTheme(shop?: CatalogShop): CSSProperties | undefined {
+  if (!shop) return undefined;
+  const theme: Record<string, string> = {};
+  if (shop.primaryColor) { theme["--accent"] = shop.primaryColor; theme["--accent-deep"] = darken(shop.primaryColor, 0.22); }
+  if (shop.accentColor) theme["--gold"] = shop.accentColor;
+  if (shop.backgroundColor) theme["--paper"] = shop.backgroundColor;
+  if (shop.textColor) { theme["--ink"] = shop.textColor; theme["--muted"] = `${shop.textColor}99`; }
+  return Object.keys(theme).length ? (theme as CSSProperties) : undefined;
+}
+
 export function CatalogApp({ initialProducts, shop }: { initialProducts?: CatalogProduct[]; shop?: CatalogShop } = {}) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("Todos");
@@ -109,6 +129,14 @@ export function CatalogApp({ initialProducts, shop }: { initialProducts?: Catalo
   const [note, setNote] = useState("");
   const [notice, setNotice] = useState("");
   const [sending, setSending] = useState(false);
+
+  useEffect(() => {
+    const theme = shopTheme(shop);
+    if (!theme) return;
+    const root = document.documentElement.style;
+    Object.entries(theme).forEach(([key, val]) => root.setProperty(key, val as string));
+    return () => Object.keys(theme).forEach((key) => root.removeProperty(key));
+  }, [shop]);
 
   const catalogProducts = initialProducts?.length ? initialProducts : demoProducts;
   const categories = ["Todos", ...Array.from(new Set(catalogProducts.map((product) => product.category)))];
@@ -162,7 +190,7 @@ export function CatalogApp({ initialProducts, shop }: { initialProducts?: Catalo
   }
 
   return (
-    <main style={shop?.primaryColor ? ({ "--accent": shop.primaryColor, "--accent-deep": shop.primaryColor } as CSSProperties) : undefined}>
+    <main style={shopTheme(shop)}>
       <section className="hero" style={shop?.bannerUrl ? { backgroundImage: `linear-gradient(90deg,rgba(37,18,12,.86),rgba(37,18,12,.2)),url(${shop.bannerUrl})` } : undefined}>
         <div className="shell hero-inner">
           <div className="brand-row"><span className={shop?.logoUrl ? "brand-mark logo" : "brand-mark"} style={shop?.logoUrl ? { backgroundImage: `url(${shop.logoUrl})` } : undefined}>{shop?.name?.slice(0, 1) ?? "S"}</span><span>{shop?.name ?? "Sabor & Brasa"}</span></div>

@@ -45,7 +45,7 @@ export async function getPublicCatalog(): Promise<PublicCatalog | null> {
 
   const supabase = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
   const results = await Promise.all([
-    supabase.from("shop_settings").select("name, logo_url, banner_url, primary_color, whatsapp_number, phone, address, instagram_handle, delivery_information").limit(1).maybeSingle(),
+    supabase.from("shop_settings").select("name, logo_url, banner_url, primary_color, accent_color, background_color, text_color, whatsapp_number, phone, address, instagram_handle, delivery_information").limit(1).maybeSingle(),
     supabase.from("categories").select("id, name").order("display_order"),
     supabase.from("products").select("id, category_id, name, description, image_url, price, availability").order("display_order"),
     supabase.from("product_variations").select("product_id, name, price_delta").order("display_order"),
@@ -62,7 +62,7 @@ export async function getPublicCatalog(): Promise<PublicCatalog | null> {
 
   if (shopError) {
     const { data: fallbackShop } = await supabase.from("shop_settings").select("name, whatsapp_number, phone, address, instagram_handle, delivery_information").limit(1).maybeSingle();
-    shop = fallbackShop ? { ...fallbackShop, logo_url: null, banner_url: null, primary_color: null } : null;
+    shop = fallbackShop ? { ...fallbackShop, logo_url: null, banner_url: null, primary_color: null, accent_color: null, background_color: null, text_color: null } : null;
   }
 
   if (!shop || !categories || !products || !variations || !addons || !hours) return null;
@@ -83,6 +83,9 @@ export async function getPublicCatalog(): Promise<PublicCatalog | null> {
       logoUrl: shop.logo_url,
       bannerUrl: shop.banner_url,
       primaryColor: shop.primary_color,
+      accentColor: shop.accent_color,
+      backgroundColor: shop.background_color,
+      textColor: shop.text_color,
       ...openingStatus
     },
     products: typedProducts.map((product) => ({

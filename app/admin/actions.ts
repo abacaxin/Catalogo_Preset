@@ -75,7 +75,7 @@ export async function saveShop(formData: FormData) {
     uploadImage(supabase, user.id, formData.get("logo_file"), "branding"),
     uploadImage(supabase, user.id, formData.get("banner_file"), "branding"),
   ]);
-  const update = { owner_id: user.id, name: value(formData, "name"), whatsapp_number: value(formData, "whatsapp_number"), phone: value(formData, "phone") || null, address: value(formData, "address") || null, instagram_handle: value(formData, "instagram_handle") || null, delivery_information: value(formData, "delivery_information") || null, primary_color: value(formData, "primary_color_picker") || value(formData, "primary_color") || "#b84122", accent_color: value(formData, "accent_color") || null, ...(logoUrl ? { logo_url: logoUrl } : {}), ...(bannerUrl ? { banner_url: bannerUrl } : {}) };
+  const update = { owner_id: user.id, name: value(formData, "name"), whatsapp_number: value(formData, "whatsapp_number"), phone: value(formData, "phone") || null, address: value(formData, "address") || null, instagram_handle: value(formData, "instagram_handle") || null, delivery_information: value(formData, "delivery_information") || null, primary_color: value(formData, "primary_color_picker") || value(formData, "primary_color") || "#b84122", accent_color: value(formData, "accent_color_picker") || value(formData, "accent_color") || "#e9b566", background_color: value(formData, "background_color_picker") || value(formData, "background_color") || "#fffaf5", text_color: value(formData, "text_color_picker") || value(formData, "text_color") || "#271a16", ...(logoUrl ? { logo_url: logoUrl } : {}), ...(bannerUrl ? { banner_url: bannerUrl } : {}) };
   await supabase.from("shop_settings").upsert(update, { onConflict: "owner_id" });
   refresh();
 }
