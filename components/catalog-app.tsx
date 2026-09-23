@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 
 export type CatalogProduct = {
   id: string | number;
@@ -23,6 +23,7 @@ export type CatalogShop = {
   deliveryInformation?: string | null;
   logoUrl?: string | null;
   bannerUrl?: string | null;
+  primaryColor?: string | null;
   isOpen?: boolean;
   statusLabel?: string;
 };
@@ -161,7 +162,7 @@ export function CatalogApp({ initialProducts, shop }: { initialProducts?: Catalo
   }
 
   return (
-    <main>
+    <main style={shop?.primaryColor ? ({ "--accent": shop.primaryColor, "--accent-deep": shop.primaryColor } as CSSProperties) : undefined}>
       <section className="hero" style={shop?.bannerUrl ? { backgroundImage: `linear-gradient(90deg,rgba(37,18,12,.86),rgba(37,18,12,.2)),url(${shop.bannerUrl})` } : undefined}>
         <div className="shell hero-inner">
           <div className="brand-row"><span className={shop?.logoUrl ? "brand-mark logo" : "brand-mark"} style={shop?.logoUrl ? { backgroundImage: `url(${shop.logoUrl})` } : undefined}>{shop?.name?.slice(0, 1) ?? "S"}</span><span>{shop?.name ?? "Sabor & Brasa"}</span></div>
