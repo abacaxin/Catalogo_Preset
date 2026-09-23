@@ -1,0 +1,5 @@
+project: Catalogo Restaurante
+workflow: DAMAGE
+language: pt-BR
+state_file: docs/00-project-state.md
+decisions_file: docs/07-decisions.md
