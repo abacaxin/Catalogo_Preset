@@ -16,7 +16,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   const supabase = await createSupabaseServerClient();
   if (!supabase) return <Setup />;
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return <Login error={params.error ? errors[params.error] : undefined} />;
+  if (!user) return <Login error={params.error ? (errors[params.error] ?? params.error) : undefined} />;
   const [{ data: shop }, { data: categories }, { data: products }, { data: hours }, { data: intents }] = await Promise.all([
     supabase.from("shop_settings").select("*").maybeSingle(),
     supabase.from("categories").select("*").order("display_order"),
@@ -24,19 +24,20 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     supabase.from("opening_hours").select("*").order("day_of_week"),
     supabase.from("send_intents").select("created_at").order("created_at", { ascending: false }).limit(5),
   ]);
-  return <Dashboard email={user.email ?? "Administrador"} shop={shop} categories={categories ?? []} products={products ?? []} hours={hours ?? []} intents={intents ?? []} />;
+  return <Dashboard email={user.email ?? "Administrador"} shop={shop} categories={categories ?? []} products={products ?? []} hours={hours ?? []} intents={intents ?? []} error={params.error ? (errors[params.error] ?? params.error) : undefined} />;
 }
 
 function Brand() { return <Link href="/" className="admin-logo"><span>S</span> Sabor & Brasa</Link>; }
 function Setup() { return <main className="admin-shell"><section className="admin-login"><Brand /><p className="eyebrow">PAINEL ADMINISTRATIVO</p><h1>Conecte o painel para continuar.</h1><p>Adicione as variáveis do Supabase, aplique a migração e crie o administrador da loja.</p><Link href="/" className="admin-back">← Voltar ao catálogo</Link></section></main>; }
 function Login({ error }: { error?: string }) { return <main className="admin-shell"><section className="admin-login"><Brand /><p className="eyebrow">PAINEL ADMINISTRATIVO</p><h1>Bem-vindo de volta.</h1><p>Acesse para manter o cardápio da sua loja.</p>{error && <p className="admin-error" role="alert">{error}</p>}<form action={signIn} className="login-form"><Field label="E-mail"><input name="email" type="email" autoComplete="email" placeholder="voce@restaurante.com" required /></Field><Field label="Senha"><input name="password" type="password" autoComplete="current-password" placeholder="Sua senha" required /></Field><button className="primary-action">Entrar no painel <span>→</span></button></form><Link href="/" className="admin-back">← Ver catálogo público</Link></section></main>; }
 
-function Dashboard({ email, shop, categories, products, hours, intents }: { email: string; shop: Shop; categories: Category[]; products: Product[]; hours: OpeningHour[]; intents: { created_at: string }[] }) {
+function Dashboard({ email, shop, categories, products, hours, intents, error }: { email: string; shop: Shop; categories: Category[]; products: Product[]; hours: OpeningHour[]; intents: { created_at: string }[]; error?: string }) {
   const byDay = Object.fromEntries(hours.map((hour) => [hour.day_of_week, hour]));
   return <main className="admin-app">
     <header className="admin-topbar"><Brand /><div><Link className="preview-link" href="/">↗ Ver catálogo</Link><form action={signOut}><button className="text-button">Sair</button></form></div></header>
     <div className="admin-layout"><aside className="admin-nav"><p>GERENCIAMENTO</p><a href="#produtos">Produtos <span>{products.length}</span></a><a href="#categorias">Categorias <span>{categories.length}</span></a><a href="#horarios">Horários</a><a href="#dados">Dados da loja</a><a href="#intencoes">Atividade</a></aside>
       <section className="admin-main">
+        {error && <p className="admin-error" role="alert">{error}</p>}
         <div className="admin-welcome"><div><p className="eyebrow">PAINEL DA LOJA</p><h1>Olá, {email.split("@")[0]}.</h1><p>Atualize seu cardápio e mantenha as informações da loja sempre certas.</p></div><Link href="#produtos" className="primary-compact">+ Novo produto</Link></div>
         <div className="admin-stats"><Stat label="Produtos publicados" value={products.filter((item) => item.availability === "available").length} detail={String(products.length) + " cadastrados"} /><Stat label="Categorias" value={categories.length} detail="Organize seu cardápio" /><Stat label="Contatos recentes" value={intents.length} detail="Aberturas do WhatsApp" /></div>
         <section id="produtos" className="admin-card"><header><div><p className="eyebrow">CARDÁPIO</p><h2>Produtos</h2><p>Cadastre itens e escolha se cada um aparece para o cliente.</p></div></header>
