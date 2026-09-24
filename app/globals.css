@@ -1,4 +1,4 @@
-:root { --ink:#271a16; --muted:#806c62; --paper:#fffaf5; --surface:#fff; --line:#eadfd7; --accent:#b84122; --accent-deep:#852d17; --gold:#e9b566; --green:#297651; --radius:22px; }
+:root { --ink:#271a16; --muted:#806c62; --paper:#fffaf5; --surface:#fff; --line:#eadfd7; --accent:#b84122; --accent-deep:#852d17; --footer:#281712; --gold:#e9b566; --green:#297651; --radius:22px; }
 .field input[type="file"] { padding:7px; color:#6f574c; font-size:12px; }.field input[type="file"]::file-selector-button { margin-right:10px; padding:6px 9px; border:0; border-radius:6px; color:#8c351f; background:#f8e6df; font:inherit; font-weight:800; }.brand-preview { display:block; max-width:100%; margin-top:7px; border:1px solid var(--line); border-radius:9px; object-fit:cover; }.logo-preview { width:64px; height:64px; }.banner-preview { width:100%; height:100px; }.color-picker { display:flex !important; align-items:center !important; gap:10px !important; }.color-picker input[type="color"] { width:52px; min-height:43px; padding:3px; cursor:pointer; }.color-picker input:not([type="color"]) { flex:1; }.color-picker output { padding:9px 12px; border:1px solid var(--line); border-radius:9px; color:#6f574c; background:#fffaf7; font-family:monospace; }
 * { box-sizing:border-box; }
 html { scroll-behavior:smooth; }
@@ -43,9 +43,9 @@ h2 { margin-bottom:8px; font:30px/1.04 Georgia,serif; letter-spacing:-.04em; }
 .product-bottom strong { font-size:15px; }
 .product-bottom b { color:var(--accent); }
 .product-bottom em { color:#8d4c39; font-style:normal; font-weight:700; }
-.footer { padding:48px 0; color:#f9e8dd; background:#281712; }
+.footer { padding:48px 0; color:#fff; background:var(--footer); }
 .footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr; gap:35px; }
-.footer p { margin:12px 0 0; color:#caaea0; font-size:13px; line-height:1.55; }
+.footer p { margin:12px 0 0; color:rgba(255,255,255,.75); font-size:13px; line-height:1.55; }
 .footer strong { font-size:13px; }
 .floating-cart { position:fixed; z-index:4; right:max(20px, calc((100vw - 1120px) / 2)); bottom:22px; display:flex; align-items:center; gap:10px; padding:14px 17px; border:0; border-radius:999px; color:#fff; background:var(--accent); box-shadow:0 14px 32px rgba(119,41,20,.34); font-size:14px; }
 .floating-cart strong { padding-left:10px; border-left:1px solid rgba(255,255,255,.35); }

@@ -113,7 +113,11 @@ function darken(hex: string, amount: number) {
 function shopTheme(shop?: CatalogShop): CSSProperties | undefined {
   if (!shop) return undefined;
   const theme: Record<string, string> = {};
-  if (shop.primaryColor) { theme["--accent"] = shop.primaryColor; theme["--accent-deep"] = darken(shop.primaryColor, 0.22); }
+  if (shop.primaryColor) {
+    theme["--accent"] = shop.primaryColor;
+    theme["--accent-deep"] = darken(shop.primaryColor, 0.22);
+    theme["--footer"] = darken(shop.primaryColor, 0.5);
+  }
   if (shop.accentColor) theme["--gold"] = shop.accentColor;
   if (shop.backgroundColor) theme["--paper"] = shop.backgroundColor;
   if (shop.textColor) { theme["--ink"] = shop.textColor; theme["--muted"] = `${shop.textColor}99`; }
