@@ -20,7 +20,12 @@ async function uploadImage(supabase: SupabaseClient, userId: string, file: FormD
   const extension = file.name.split(".").pop()?.replace(/[^a-z0-9]/gi, "") || "jpg";
   const path = `${userId}/${folder}/${crypto.randomUUID()}.${extension}`;
   const { error } = await supabase.storage.from("catalog-media").upload(path, await file.arrayBuffer(), { contentType: file.type, upsert: false });
-  if (error) throw error;
+  if (error) {
+    if (error.message.toLowerCase().includes("bucket not found")) {
+      throw new Error("O armazenamento de imagens ainda não foi configurado. Crie o bucket público \"catalog-media\" no Supabase e tente novamente.");
+    }
+    throw new Error(`Não foi possível enviar a imagem: ${error.message}`);
+  }
   return supabase.storage.from("catalog-media").getPublicUrl(path).data.publicUrl;
 }
 
@@ -138,10 +143,16 @@ export async function deleteProduct(formData: FormData) {
 
 export async function saveShop(formData: FormData) {
   const { supabase, user } = await currentUser();
-  const [logoUrl, bannerUrl] = await Promise.all([
-    uploadImage(supabase, user.id, formData.get("logo_file"), "branding"),
-    uploadImage(supabase, user.id, formData.get("banner_file"), "branding"),
-  ]);
+  let logoUrl: string | null = null;
+  let bannerUrl: string | null = null;
+  try {
+    [logoUrl, bannerUrl] = await Promise.all([
+      uploadImage(supabase, user.id, formData.get("logo_file"), "branding"),
+      uploadImage(supabase, user.id, formData.get("banner_file"), "branding"),
+    ]);
+  } catch (error) {
+    fail(error instanceof Error ? error.message : "Não foi possível enviar a imagem.");
+  }
   const update = { owner_id: user.id, name: value(formData, "name"), whatsapp_number: value(formData, "whatsapp_number"), phone: value(formData, "phone") || null, address: value(formData, "address") || null, instagram_handle: value(formData, "instagram_handle") || null, delivery_information: value(formData, "delivery_information") || null, primary_color: color(formData, "primary_color", "#b84122"), accent_color: color(formData, "accent_color", "#e9b566"), background_color: color(formData, "background_color", "#fffaf5"), text_color: color(formData, "text_color", "#271a16"), ...(logoUrl ? { logo_url: logoUrl } : {}), ...(bannerUrl ? { banner_url: bannerUrl } : {}) };
   const { error } = await supabase.from("shop_settings").upsert(update, { onConflict: "owner_id" });
   assertSuccess(error);
